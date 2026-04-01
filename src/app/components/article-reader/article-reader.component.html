@@ -30,6 +30,8 @@
     [class.article-reader__viewer--empty]="!article()"
     (mouseup)="handleViewerSelection()"
     (keyup)="handleViewerSelection()"
+    (touchstart)="handleViewerTouchStart()"
+    (touchend)="handleViewerTouchEnd()"
     (click)="handleViewerClick($event)"
   ></article>
 

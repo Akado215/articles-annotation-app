@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   computed,
@@ -35,8 +36,12 @@ const FALLBACK_ANNOTATION_COLOR = '#6366f1';
 })
 export class ArticleReaderComponent implements AfterViewInit {
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly articleViewerRef = viewChild<ElementRef<HTMLElement>>('articleViewer');
   private readonly viewReady = signal(false);
+  private selectionSyncTimer: ReturnType<typeof setTimeout> | null = null;
+  private touchSelectionSessionTimer: ReturnType<typeof setTimeout> | null = null;
+  private touchSelectionActive = false;
 
   readonly article = input<Article | null>(null);
   readonly palette = input.required<PaletteOption[]>();
@@ -161,6 +166,11 @@ export class ArticleReaderComponent implements AfterViewInit {
         { emitEvent: false }
       );
     });
+
+    this.destroyRef.onDestroy(() => {
+      this.clearSelectionSyncTimer();
+      this.clearTouchSelectionSession();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -168,6 +178,28 @@ export class ArticleReaderComponent implements AfterViewInit {
   }
 
   protected handleViewerSelection(): void {
+    this.scheduleSelectionSync();
+  }
+
+  protected handleViewerTouchStart(): void {
+    this.startTouchSelectionSession();
+  }
+
+  protected handleViewerTouchEnd(): void {
+    this.startTouchSelectionSession();
+    this.scheduleSelectionSync(160);
+  }
+
+  @HostListener('document:selectionchange')
+  protected handleDocumentSelectionChange(): void {
+    if (!this.touchSelectionActive) {
+      return;
+    }
+
+    this.scheduleSelectionSync(160);
+  }
+
+  private syncViewerSelection(): void {
     if (this.editingAnnotation()) {
       return;
     }
@@ -182,7 +214,10 @@ export class ArticleReaderComponent implements AfterViewInit {
     const selectionSnapshot = getSelectionSnapshot(viewer, window.getSelection());
 
     if (!selectionSnapshot) {
-      this.pendingSelection.set(null);
+      if (!this.pendingSelection()) {
+        this.pendingSelection.set(null);
+      }
+
       return;
     }
 
@@ -190,11 +225,13 @@ export class ArticleReaderComponent implements AfterViewInit {
       this.pendingSelection.set(null);
       this.localMessage.set('Пересекающиеся аннотации не поддерживаются. Выберите свободный участок текста.');
       this.clearBrowserSelection();
+      this.clearTouchSelectionSession();
       return;
     }
 
     this.pendingSelection.set(selectionSnapshot);
     this.localMessage.set('');
+    this.clearTouchSelectionSession();
   }
 
   protected handleViewerClick(event: MouseEvent): void {
@@ -304,5 +341,44 @@ export class ArticleReaderComponent implements AfterViewInit {
 
   private clearBrowserSelection(): void {
     window.getSelection()?.removeAllRanges();
+  }
+
+  private scheduleSelectionSync(delay = 0): void {
+    this.clearSelectionSyncTimer();
+    this.selectionSyncTimer = setTimeout(() => {
+      this.selectionSyncTimer = null;
+      this.syncViewerSelection();
+    }, delay);
+  }
+
+  private clearSelectionSyncTimer(): void {
+    if (!this.selectionSyncTimer) {
+      return;
+    }
+
+    clearTimeout(this.selectionSyncTimer);
+    this.selectionSyncTimer = null;
+  }
+
+  private startTouchSelectionSession(): void {
+    this.touchSelectionActive = true;
+
+    if (this.touchSelectionSessionTimer) {
+      clearTimeout(this.touchSelectionSessionTimer);
+    }
+
+    this.touchSelectionSessionTimer = setTimeout(() => {
+      this.touchSelectionSessionTimer = null;
+      this.touchSelectionActive = false;
+    }, 1500);
+  }
+
+  private clearTouchSelectionSession(): void {
+    if (this.touchSelectionSessionTimer) {
+      clearTimeout(this.touchSelectionSessionTimer);
+      this.touchSelectionSessionTimer = null;
+    }
+
+    this.touchSelectionActive = false;
   }
 }
