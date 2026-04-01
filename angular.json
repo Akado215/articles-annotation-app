@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "text-annotation-app-clode": {
+    "articles-annotation-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "text-annotation-app-clode:build:production"
+              "buildTarget": "articles-annotation-app:build:production"
             },
             "development": {
-              "buildTarget": "text-annotation-app-clode:build:development"
+              "buildTarget": "articles-annotation-app:build:development"
             }
           },
           "defaultConfiguration": "development"

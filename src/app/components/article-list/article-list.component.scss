@@ -1,0 +1,97 @@
+@use '../../../theme/tokens' as tokens;
+
+$headline-font: Georgia, 'Times New Roman', serif;
+$interactive-transition:
+  transform 0.18s ease,
+  background-color 0.18s ease;
+
+@mixin hover-lift {
+  cursor: pointer;
+  transition: $interactive-transition;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.article-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+
+  &__title,
+  &__section-title {
+    margin: 0;
+    font-family: $headline-font;
+    letter-spacing: -0.03em;
+  }
+
+  &__eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.72;
+  }
+
+  &__description,
+  &__card-meta,
+  &__card-time,
+  &__empty,
+  &__section-counter {
+    color: tokens.$color-text-inverse-muted;
+  }
+
+  &__create-button,
+  &__card {
+    border: 0;
+    @include hover-lift;
+  }
+
+  &__create-button {
+    padding: 0.9rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 600;
+    background: var(--accent);
+    color: tokens.$color-text-inverse;
+    box-shadow: tokens.$shadow-accent-button-strong;
+  }
+
+  &__list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &__section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__section-meta {
+    font-size: 0.92rem;
+  }
+
+  &__card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem;
+    border-radius: 20px;
+    text-align: left;
+    background: tokens.$color-accent-card;
+    box-shadow: inset 0 0 0 1px tokens.$color-accent-stroke-soft;
+    color: inherit;
+
+    &--active,
+    &:hover {
+      background: tokens.$color-accent-card-hover;
+    }
+  }
+}

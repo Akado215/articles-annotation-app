@@ -1,0 +1,101 @@
+@use '../theme/tokens' as tokens;
+
+$tablet-breakpoint: 1240px;
+$mobile-breakpoint: 720px;
+
+:host {
+  --panel: #{tokens.$color-surface-panel};
+  --panel-strong: #{tokens.$color-surface-panel-strong};
+  --line: #{tokens.$color-accent-border};
+  --text: #{tokens.$color-text-primary};
+  --muted: #{tokens.$color-text-secondary};
+  --accent: #{tokens.$color-accent-primary};
+  --accent-strong: #{tokens.$color-accent-strong};
+  --error: #{tokens.$color-text-danger};
+  --shadow: #{tokens.$shadow-panel};
+  display: block;
+  min-height: 100dvh;
+  color: var(--text);
+}
+
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  background: tokens.$gradient-app-shell;
+}
+
+.app-layout {
+  width: min(100%, 1188px);
+  min-width: 1110px;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+
+  &__sidebar {
+    display: block;
+    min-height: calc(100dvh - 3rem);
+    padding: 2rem;
+    border: 1px solid tokens.$color-white-12;
+    border-radius: 28px;
+    backdrop-filter: blur(12px);
+    background: tokens.$gradient-sidebar;
+    color: tokens.$color-text-inverse;
+    box-shadow: var(--shadow);
+  }
+
+  &__content {
+    display: flex;
+    justify-content: center;
+  }
+
+  &__panel {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid tokens.$color-white-22;
+    border-radius: 28px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+
+    &--main {
+      width: 100%;
+      max-width: 767px;
+      min-height: calc(100dvh - 3.5rem);
+      margin-inline: auto;
+    }
+  }
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .app-shell {
+    padding: 0;
+  }
+
+  .app-layout {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: 1fr;
+
+    &__sidebar {
+      min-height: auto;
+    }
+  }
+}
+
+@media (max-width: $mobile-breakpoint) {
+  .app-shell {
+    padding: 0;
+  }
+
+  .app-layout {
+    gap: 1rem;
+
+    &__sidebar,
+    &__panel {
+      padding: 1rem;
+      border-radius: 22px;
+    }
+  }
+}

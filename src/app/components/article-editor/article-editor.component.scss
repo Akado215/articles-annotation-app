@@ -1,0 +1,127 @@
+@use '../../../theme/tokens' as tokens;
+
+$headline-font: Georgia, 'Times New Roman', serif;
+$interactive-transition:
+  transform 0.18s ease,
+  background-color 0.18s ease;
+
+@mixin form-control {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: tokens.$color-surface-input;
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+
+  &:focus {
+    outline: 2px solid tokens.$color-accent-focus;
+    border-color: tokens.$color-accent-border-strong;
+  }
+}
+
+@mixin pill-button {
+  border: 0;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 0.9rem 1.2rem;
+  font-weight: 600;
+  transition: $interactive-transition;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+:host {
+  display: block;
+}
+
+.article-editor {
+  &__title {
+    margin: 0;
+    font-family: $headline-font;
+    letter-spacing: -0.03em;
+  }
+
+  &__eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.72;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__meta,
+  &__hint,
+  &__empty,
+  &__error {
+    color: var(--muted);
+  }
+
+  &__error {
+    color: var(--error);
+  }
+
+  &__form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &__field {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  &__label {
+    font-weight: 600;
+  }
+
+  &__input,
+  &__textarea {
+    @include form-control;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__button {
+    @include pill-button;
+
+    &--primary {
+      background: var(--accent);
+      color: tokens.$color-text-inverse;
+      box-shadow: tokens.$shadow-accent-button;
+    }
+
+    &--ghost {
+      background: tokens.$color-accent-tint;
+      color: var(--accent-strong);
+    }
+  }
+
+  &__feedback {
+    padding: 0.85rem 1rem;
+    border-radius: 16px;
+    background: tokens.$color-accent-tint;
+    color: var(--accent-strong);
+    opacity: 1;
+    transition: opacity 2s ease;
+
+    &--fading {
+      opacity: 0;
+    }
+  }
+}

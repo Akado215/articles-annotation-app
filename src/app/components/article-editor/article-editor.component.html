@@ -1,0 +1,64 @@
+<section class="article-editor">
+  <div class="article-editor__header">
+    <div class="article-editor__header-copy">
+      <p class="article-editor__eyebrow">Режим редактирования</p>
+      <h2 class="article-editor__title">{{ creating() ? 'Новая статья' : 'Редактирование статьи' }}</h2>
+    </div>
+
+    <span class="article-editor__meta" *ngIf="article() as currentArticle">{{ annotationCountLabel(currentArticle) }}</span>
+  </div>
+
+  <ng-container *ngIf="hasEditableArticle(); else emptyEditor">
+    <form class="article-editor__form" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="article-editor__field">
+        <span class="article-editor__label">Заголовок</span>
+        <input
+          class="article-editor__input"
+          type="text"
+          formControlName="title"
+          placeholder="Например, обзор пользовательского сценария"
+        />
+        <small class="article-editor__error" *ngIf="titleControl.invalid && titleControl.touched">
+          Укажите заголовок статьи.
+        </small>
+      </label>
+
+      <label class="article-editor__field">
+        <span class="article-editor__label">Текст статьи</span>
+        <textarea
+          class="article-editor__textarea"
+          formControlName="content"
+          rows="12"
+          placeholder="Введите текст без форматирования"
+        ></textarea>
+        <small class="article-editor__error" *ngIf="contentControl.invalid && contentControl.touched">
+          Текст статьи не должен быть пустым.
+        </small>
+      </label>
+
+      <p class="article-editor__hint" *ngIf="annotationCount() > 0">
+        В этой статье уже есть {{ annotationCountLabel(annotationCount()) }}. При изменении текста приложение попросит
+        подтвердить очистку аннотаций.
+      </p>
+
+      <div
+        *ngIf="feedback()"
+        class="article-editor__feedback"
+        [class.article-editor__feedback--fading]="feedbackFading()"
+      >
+        {{ feedback() }}
+      </div>
+
+      <div class="article-editor__actions">
+        <button class="article-editor__button article-editor__button--primary" type="submit">Сохранить</button>
+        <button class="article-editor__button article-editor__button--ghost" type="button" (click)="cancelEditor.emit()">
+          Отменить
+        </button>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #emptyEditor>
+    <p class="article-editor__empty">Выберите статью слева или создайте новую.</p>
+  </ng-template>
+</section>

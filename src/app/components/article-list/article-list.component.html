@@ -1,0 +1,30 @@
+<section class="article-nav">
+  <button class="article-nav__create-button" type="button" (click)="createArticle.emit()">
+    Новая статья
+  </button>
+
+  <section class="article-nav__list">
+    <header class="article-nav__section-header">
+      <h2 class="article-nav__section-title">Статьи</h2>
+      <span class="article-nav__section-counter">{{ articles().length }}</span>
+    </header>
+
+    <ng-container *ngIf="articles().length; else emptyArticles">
+      <button
+        *ngFor="let article of articles(); trackBy: trackByArticleId"
+        type="button"
+        class="article-nav__card"
+        [class.article-nav__card--active]="article.id === selectedArticleId() && !creating()"
+        (click)="selectArticle.emit(article.id)"
+      >
+        <strong class="article-nav__card-title">{{ article.title }}</strong>
+        <span class="article-nav__card-meta">{{ annotationCountLabel(article) }}</span>
+        <small class="article-nav__card-time">Обновлено {{ formatDate(article.updatedAt) }}</small>
+      </button>
+    </ng-container>
+  </section>
+
+  <ng-template #emptyArticles>
+    <p class="article-nav__empty">Пока нет статей. Создайте первую, чтобы начать аннотирование.</p>
+  </ng-template>
+</section>

@@ -1,0 +1,114 @@
+<section class="article-reader">
+  <div class="article-reader__header">
+    <div class="article-reader__header-copy">
+      <p class="article-reader__eyebrow">Просмотр и аннотации</p>
+      <h2 class="article-reader__title">{{ article()?.title || 'Выберите статью или создайте новую' }}</h2>
+    </div>
+
+    <div class="article-reader__header-side">
+      <span class="article-reader__meta" *ngIf="article()">{{ annotationCountLabel(article()) }}</span>
+
+      <div class="article-reader__actions" *ngIf="article()">
+        <button class="article-reader__button article-reader__button--ghost" type="button" (click)="editArticle.emit()">
+          Редактировать
+        </button>
+        <button class="article-reader__button article-reader__button--danger" type="button" (click)="deleteArticle.emit()">
+          Удалить
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p class="article-reader__hint">
+    Выделите фрагмент текста ниже, затем выберите цвет и добавьте примечание. Клик по существующей аннотации
+    переключает её в режим редактирования.
+  </p>
+
+  <article
+    #articleViewer
+    class="article-reader__viewer"
+    [class.article-reader__viewer--empty]="!article()"
+    (mouseup)="handleViewerSelection()"
+    (keyup)="handleViewerSelection()"
+    (click)="handleViewerClick($event)"
+  ></article>
+
+  <div
+    *ngIf="viewerMessage()"
+    class="article-reader__feedback"
+    [class.article-reader__feedback--fading]="viewerFeedbackFading()"
+  >
+    {{ viewerMessage() }}
+  </div>
+</section>
+
+<div *ngIf="dialogMode()" class="annotation-dialog">
+  <button
+    class="annotation-dialog__backdrop"
+    type="button"
+    (click)="cancel()"
+    aria-label="Закрыть форму аннотации"
+  ></button>
+
+  <section class="annotation-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="annotation-dialog-title">
+    <div class="annotation-dialog__header">
+      <div class="annotation-dialog__header-copy">
+        <p class="annotation-dialog__eyebrow">{{ dialogEyebrow() }}</p>
+        <h3 class="annotation-dialog__title" id="annotation-dialog-title">{{ dialogTitle() }}</h3>
+      </div>
+
+      <button class="annotation-dialog__button annotation-dialog__button--ghost" type="button" (click)="cancel()">
+        Отменить
+      </button>
+    </div>
+
+    <blockquote class="annotation-dialog__quote">{{ activeQuote() }}</blockquote>
+
+    <div *ngIf="dialogMessage()" class="annotation-dialog__message">{{ dialogMessage() }}</div>
+
+    <form class="annotation-dialog__form" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="annotation-dialog__field">
+        <span class="annotation-dialog__label">Цвет подчёркивания</span>
+        <div class="annotation-dialog__palette">
+          <button
+            *ngFor="let option of palette()"
+            type="button"
+            class="annotation-dialog__swatch"
+            [class.annotation-dialog__swatch--active]="form.controls.color.value === option.value"
+            [style.--swatch-color]="option.value"
+            (click)="form.controls.color.setValue(option.value)"
+            [attr.aria-label]="option.label"
+          ></button>
+        </div>
+      </label>
+
+      <label class="annotation-dialog__field">
+        <span class="annotation-dialog__label">Примечание</span>
+        <textarea
+          class="annotation-dialog__textarea"
+          formControlName="note"
+          rows="4"
+          placeholder="Что важно в этом фрагменте?"
+        ></textarea>
+        <small class="annotation-dialog__error" *ngIf="noteControl.invalid && noteControl.touched">
+          Добавьте текст примечания.
+        </small>
+      </label>
+
+      <div class="annotation-dialog__actions">
+        <button class="annotation-dialog__button annotation-dialog__button--primary" type="submit">
+          {{ dialogActionLabel() }}
+        </button>
+
+        <button
+          *ngIf="dialogMode() === 'edit'"
+          class="annotation-dialog__button annotation-dialog__button--danger"
+          type="button"
+          (click)="removeCurrentAnnotation()"
+        >
+          Удалить аннотацию
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
